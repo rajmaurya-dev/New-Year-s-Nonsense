@@ -3,9 +3,11 @@ import { Inter } from 'next/font/google'
 import { Poppins } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/Navbar'
-import { ClerkProvider } from '@clerk/nextjs'
+import { ClerkProvider, auth } from '@clerk/nextjs'
+import { Toaster } from 'react-hot-toast'
 const inter = Inter({ subsets: ['latin'] })
 const poppins = Poppins({ weight: ["400", "500", "600", '700'], subsets: ["latin"] })
+
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -21,6 +23,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={poppins.className}>
+          <Toaster />
           <Navbar />
           {children}</body>
       </html>
