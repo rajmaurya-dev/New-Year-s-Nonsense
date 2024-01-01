@@ -1,19 +1,19 @@
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs";
+
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-  req: NextRequest,
+  req: Request,
   { params }: { params: { id: string } }
 ) {
   try {
     const { userId } = auth();
     const id = params.id;
-
     const resolution = await db.resolution.findUnique({
       where: {
         id: id as string,
-        userId: userId!,
+        // userId: userId!,
       },
     });
 
