@@ -7,7 +7,7 @@ export default function Home() {
     <main className='bg-secondary flex custom-h items-center justify-center'>
       <div className='text-center'>
         <h1 className='text-4xl md:text-6xl font-bold text-white mb-4'>
-          Resolutions so ridiculous, they'll have you laughing into 2024.
+          Resolutions so ridiculous, <br /> they'll have you laughing into 2024.
         </h1>
         <p className='text-lg text-gray-300 mb-8'>
           Resolutions: Unboring them since 2023
