@@ -1,4 +1,5 @@
 'use client'
+import Popup from '@/components/Popup';
 import { db } from '@/lib/db';
 import { useAuth } from '@clerk/nextjs';
 import axios from 'axios';
@@ -12,6 +13,7 @@ import Markdown from 'react-markdown';
 const Resolution = ({ params }: any) => {
     const router = useRouter();
     const { userId } = useAuth();
+
 
 
 
@@ -70,14 +72,20 @@ const Resolution = ({ params }: any) => {
             </div>
             {
                 userId === resolution.userId && (
-                    <button className='mt-4 bg-white text-primary font-bold py-2 px-4 rounded flex gap-5 justify-center hover:bg-red-600' onClick={() => handleDelete(resolution.id)}>
-                        <Trash /> <span className='font-thin'>Delete</span>
-                    </button>
+                    <>
+                        <button className='mt-4 bg-white text-primary font-bold py-2 px-4 rounded flex gap-5 justify-center hover:bg-red-600' onClick={() => handleDelete(resolution.id)}>
+                            <Trash /> <span className='font-thin'>Delete</span>
+                        </button>
+
+
+                        <button className='mt-4 bg-white text-primary font-bold py-2 px-4 rounded flex gap-5 justify-center hover:bg-green-600' onClick={copyToClipboard}>
+                            <Share /> <span className='font-thin'>Share with friends and family</span>
+                        </button>
+
+                    </>
                 )
             }
-            <button className='mt-4 bg-white text-primary font-bold py-2 px-4 rounded flex gap-5 justify-center hover:bg-green-600' onClick={copyToClipboard}>
-                <Share /> <span className='font-thin'>Share with friends and family</span>
-            </button>
+            {!userId && <Popup message='login now and start creating your Resolutions With help of AI' />}
         </div>
 
     )
