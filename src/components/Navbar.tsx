@@ -16,7 +16,7 @@ const Navbar = () => {
                     userId ? (
                         <>
                             <Link className='bg-white w-[185] h-[60] rounded-lg px-2 py-1' href="/create">Create</Link>
-                            <Link className='hover:text-secondary' href="/resolutions">Resolutions</Link>
+                            <Link className='text-gray-500 hover:text-white' href="/resolutions">Resolutions</Link>
                             <UserButton afterSignOutUrl="/" />
                         </>
                     ) : (

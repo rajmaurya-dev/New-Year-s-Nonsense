@@ -113,7 +113,7 @@ const Create = () => {
 
             {aiData && (
                 <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 z-50 ">
-                    <div className="bg-primary p-4 sm:p-8 rounded-10 w-full sm:w-[90vw] lg:w-[80vw] xl:w-[60vw] 2xl:w-[50vw] mx-2 md:mx-0 rounded-md">
+                    <div className="bg-primary p-4 sm:p-8 rounded-10 w-full sm:w-[90vw] lg:w-[80vw] xl:w-[60vw] 2xl:w-[50vw] mx-2 md:mx-0 rounded-md text-white">
                         <Markdown>{aiData}</Markdown>
                         <div className="flex mt-4 gap-4">
                             <button onClick={handleCreate} disabled={loading} className=" bg-blue-500 text-white px-4 py-2 rounded">Create</button>

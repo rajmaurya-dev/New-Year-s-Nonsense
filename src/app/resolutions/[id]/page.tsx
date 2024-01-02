@@ -3,7 +3,7 @@ import Popup from '@/components/Popup';
 import { db } from '@/lib/db';
 import { useAuth } from '@clerk/nextjs';
 import axios from 'axios';
-import { Share, Trash } from 'lucide-react';
+import { LoaderIcon, Share, Trash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast';
@@ -13,10 +13,6 @@ import Markdown from 'react-markdown';
 const Resolution = ({ params }: any) => {
     const router = useRouter();
     const { userId } = useAuth();
-
-
-
-
     const [resolution, setResolution] = useState<{ id: string; content: string; userId: string; creatorName: any; createdAt: Date; updatedAt: Date; } | null>(null);
 
     useEffect(() => {
@@ -35,7 +31,9 @@ const Resolution = ({ params }: any) => {
     }, [params.id, userId]);
 
     if (!resolution) {
-        return <div>Loading...</div>;
+        return <div className='custom-h w-screen grid place-content-center'>
+            <LoaderIcon size={48} className=' text-blue-700 animate-spin' />
+        </div>;
     }
 
     const copyToClipboard = async () => {
@@ -64,7 +62,7 @@ const Resolution = ({ params }: any) => {
 
     return (
         <div className='custom-h grid place-content-center text-start'>
-            <div className='bg-white shadow-md rounded-lg p-4 text-primary'>
+            <div className="md:w-[60vw] bg-gray-400 shadow-md rounded-lg p-4 text-white backdrop-filter backdrop-blur-sm bg-opacity-10  ">
                 <Markdown>{resolution.content}</Markdown>
                 <div>
                     <span className='font-bold'>Created by:{resolution?.creatorName} </span>
@@ -72,17 +70,17 @@ const Resolution = ({ params }: any) => {
             </div>
             {
                 userId === resolution.userId && (
-                    <>
+                    <div className='flex gap-4 justify-center'>
                         <button className='mt-4 bg-white text-primary font-bold py-2 px-4 rounded flex gap-5 justify-center hover:bg-red-600' onClick={() => handleDelete(resolution.id)}>
                             <Trash /> <span className='font-thin'>Delete</span>
                         </button>
 
 
                         <button className='mt-4 bg-white text-primary font-bold py-2 px-4 rounded flex gap-5 justify-center hover:bg-green-600' onClick={copyToClipboard}>
-                            <Share /> <span className='font-thin'>Share with friends and family</span>
+                            <Share /> <span className='font-thin'>Share</span>
                         </button>
 
-                    </>
+                    </div>
                 )
             }
             {!userId && <Popup message='login now and start creating your Resolutions With help of AI' />}

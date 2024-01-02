@@ -4,7 +4,7 @@
 
 body {
   min-height: calc(100vh - 100px);
-  background-color: #0a2647;
+  background-color: #02041d;
 }
 
 .custom-h {
@@ -25,7 +25,6 @@ body {
   break-inside: avoid;
   padding: 1em;
   margin-bottom: 1em;
-  background-color: white;
 }
 
 button:disabled {
