@@ -2,19 +2,20 @@
 import { db } from '@/lib/db';
 import { useAuth } from '@clerk/nextjs';
 import axios from 'axios';
-import { Share } from 'lucide-react';
+import { Share, Trash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast';
 import Markdown from 'react-markdown';
 
+
 const Resolution = ({ params }: any) => {
-    console.log(params)
-    const { userId, } = useAuth();
+    const router = useRouter();
+    const { userId } = useAuth();
 
 
 
-    const [resolution, setResolution] = useState<{ id: string; content: string; userId: string; createdAt: Date; updatedAt: Date; } | null>(null);
+    const [resolution, setResolution] = useState<{ id: string; content: string; userId: string; creatorName: any; createdAt: Date; updatedAt: Date; } | null>(null);
 
     useEffect(() => {
         const fetchResolution = async () => {
@@ -43,12 +44,37 @@ const Resolution = ({ params }: any) => {
             console.error('Failed to copy text: ', err);
         }
     };
+    const handleDelete = async (id: any) => {
+        try {
+            const resolution = await axios.delete('/api/create', {
+                data: {
+                    id: id,
+                    userId: userId,
+                },
+            });
+            router.push('/resolutions');
+            toast.success('Resolution deleted successfully');
+        } catch (error: any) {
+            console.error('Error deleting resolution:', error);
+            toast.error('Error deleting resolution', error);
+        }
+    };
 
     return (
         <div className='custom-h grid place-content-center text-start'>
             <div className='bg-white shadow-md rounded-lg p-4 text-primary'>
                 <Markdown>{resolution.content}</Markdown>
+                <div>
+                    <span className='font-bold'>Created by:{resolution?.creatorName} </span>
+                </div>
             </div>
+            {
+                userId === resolution.userId && (
+                    <button className='mt-4 bg-white text-primary font-bold py-2 px-4 rounded flex gap-5 justify-center hover:bg-red-600' onClick={() => handleDelete(resolution.id)}>
+                        <Trash /> <span className='font-thin'>Delete</span>
+                    </button>
+                )
+            }
             <button className='mt-4 bg-white text-primary font-bold py-2 px-4 rounded flex gap-5 justify-center hover:bg-green-600' onClick={copyToClipboard}>
                 <Share /> <span className='font-thin'>Share with friends and family</span>
             </button>

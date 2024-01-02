@@ -11,9 +11,10 @@ datasource db {
 }
 
 model Resolution {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  content   String
-  userId    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  content     String
+  userId      String
+  creatorName String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

@@ -8,6 +8,7 @@ export async function POST(req: NextRequest) {
       data: {
         content: body.content,
         userId: body.userId,
+        creatorName: body.creatorName,
       },
     });
     return NextResponse.json(resolution, { status: 200 });

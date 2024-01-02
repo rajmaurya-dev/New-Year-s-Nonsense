@@ -2,9 +2,9 @@
 import Markdown from 'react-markdown'
 import axios from 'axios';
 import React, { useState } from 'react'
-import { useForm } from 'react-hook-form';
+import { set, useForm } from 'react-hook-form';
 
-import { useAuth } from '@clerk/nextjs';
+import { useAuth, useUser } from '@clerk/nextjs';
 import toast from 'react-hot-toast';
 
 import { LoaderIcon, Wand } from 'lucide-react';
@@ -18,6 +18,7 @@ const Create = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [aiData, setAiData] = useState<string | null>(null);
     const { userId, } = useAuth();
+    const { user } = useUser()
     const { register, handleSubmit, watch } = useForm<FormData>(
         {
             defaultValues: {
@@ -30,7 +31,7 @@ const Create = () => {
     const onSubmit = async (data: FormData) => {
         try {
             setLoading(true);
-            const response = await axios.post('/api/ai/realistic', { prompt: data.about });
+            const response = await axios.post('/api/ai/realistic', { prompt: data.about, goal: data.goal });
             toast.success('Resolution generated successfully');
             setAiData(response.data);
             setLoading(false);
@@ -40,17 +41,21 @@ const Create = () => {
             console.error(error);
         }
     };
+    console.log(user?.firstName)
     const handleCreate = async () => {
+        setLoading(true);
         try {
 
             const resolution = await axios.post('/api/create', {
                 content: aiData,
                 userId: userId,
+                creatorName: user?.firstName
             });
-
+            setLoading(false);
             toast.success('Resolution created successfully');
             setAiData(null);
         } catch (error: any) {
+            setLoading(false);
             setAiData(null);
             console.error('Error creating resolution:', error);
             toast.error('Error creating resolution', error);
@@ -100,8 +105,8 @@ const Create = () => {
                     </div>
                 </div>
 
-                <button type="submit" className='w-full md:w-[465px] mt-5 py-2 bg-white text-center text-black rounded-2xl flex justify-center'>
-                    {loading ? <LoaderIcon /> : <Wand className='text-primary' />}
+                <button type="submit" disabled={loading} className='w-full md:w-[465px] mt-5 py-2 bg-white text-center text-black rounded-2xl flex justify-center'>
+                    {loading ? <LoaderIcon className='animate-spin' /> : <Wand className='text-primary' />}
                 </button>
 
             </form>
@@ -111,7 +116,7 @@ const Create = () => {
                     <div className="bg-primary p-4 sm:p-8 rounded-10 w-full sm:w-[90vw] lg:w-[80vw] xl:w-[60vw] 2xl:w-[50vw] mx-2 md:mx-0 rounded-md">
                         <Markdown>{aiData}</Markdown>
                         <div className="flex mt-4">
-                            <button onClick={handleCreate} className="mr-2 bg-blue-500 text-white px-4 py-2 rounded">Create</button>
+                            <button onClick={handleCreate} disabled={loading} className="mr-2 bg-blue-500 text-white px-4 py-2 rounded">Create</button>
                             <button onClick={() => setAiData(null)} className="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
                         </div>
                     </div>

@@ -1,6 +1,4 @@
 'use client'
-import Card from '@/components/Card'
-import { db } from '@/lib/db';
 import { useAuth } from '@clerk/nextjs';
 import axios from 'axios';
 import { ArrowBigRightDash, ArrowRightCircle, Delete, DoorOpen, Share, Trash } from 'lucide-react';
@@ -11,6 +9,7 @@ import Markdown from 'react-markdown';
 
 const MyResolutions = () => {
     const { userId, } = useAuth();
+
     const [resolutions, setResolutions] = useState<{ id: string; content: string; userId: string; createdAt: Date; updatedAt: Date; }[]>([]);
 
     const fetchResolutions = async () => {
@@ -29,7 +28,7 @@ const MyResolutions = () => {
 
         try {
             await navigator.clipboard.writeText(`https://nyn.rajcrafts.tech/resolutions/${id}`);
-            setResolutions(prevResolutions => prevResolutions.filter(resolution => resolution.id !== id));
+
             toast.success('Copied to clipboard!');
         } catch (err: any) {
             toast.error('Failed to copy text: ', err);
@@ -45,7 +44,7 @@ const MyResolutions = () => {
                     userId: userId,
                 },
             });
-            fetchResolutions();
+            setResolutions(prevResolutions => prevResolutions.filter(resolution => resolution.id !== id));
             toast.success('Resolution deleted successfully');
         } catch (error: any) {
             console.error('Error deleting resolution:', error);

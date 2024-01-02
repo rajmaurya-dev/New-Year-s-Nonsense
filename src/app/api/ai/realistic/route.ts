@@ -18,19 +18,36 @@ const generationConfig = {
   maxOutputTokens: 2048,
 };
 export async function POST(request: NextRequest) {
-  const { prompt } = await request.json();
-  const parts = [
-    {
-      text: `Make resolutions that seem impossible for the New Year, but can actually happen in real life. Keep the goals short and easy to understand. give 10 points only in markdown format. no big sentences ${prompt}}}`,
-    },
-  ];
-  const result = await model.generateContent({
-    contents: [{ role: "user", parts }],
-    generationConfig,
-    safetySettings,
-  });
+  const { prompt, goal } = await request.json();
 
-  const response = result.response;
-  const aiResponse = response.text();
-  return NextResponse.json(aiResponse);
+  if (goal === "realistic") {
+    const parts = [
+      {
+        text: `Make resolutions that seem impossible for the New Year, but can actually happen in real life. Keep the goals short and easy to understand. give 10 points only in markdown format. no big sentences ${prompt}}}`,
+      },
+    ];
+    const result = await model.generateContent({
+      contents: [{ role: "user", parts }],
+      generationConfig,
+      safetySettings,
+    });
+    const response = result.response;
+    const aiResponse = response.text();
+    return NextResponse.json(aiResponse);
+  }
+  if (goal === "unrealistic") {
+    const parts = [
+      {
+        text: `Make resolutions that seem impossible and funny for the New Year. Keep the goals short and easy to understand. give 10 points only in markdown format. no big sentences ${prompt}}}`,
+      },
+    ];
+    const result = await model.generateContent({
+      contents: [{ role: "user", parts }],
+      generationConfig,
+      safetySettings,
+    });
+    const response = result.response;
+    const aiResponse = response.text();
+    return NextResponse.json(aiResponse);
+  }
 }

@@ -27,3 +27,8 @@ body {
   margin-bottom: 1em;
   background-color: white;
 }
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
