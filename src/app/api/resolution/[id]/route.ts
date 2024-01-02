@@ -13,7 +13,6 @@ export async function GET(
     const resolution = await db.resolution.findUnique({
       where: {
         id: id as string,
-        // userId: userId!,
       },
     });
 

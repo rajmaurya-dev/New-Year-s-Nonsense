@@ -1,6 +1,4 @@
 'use client'
-
-import Resolution from '@/models/content';
 import Markdown from 'react-markdown'
 import axios from 'axios';
 import React, { useState } from 'react'
@@ -8,7 +6,7 @@ import { useForm } from 'react-hook-form';
 
 import { useAuth } from '@clerk/nextjs';
 import toast from 'react-hot-toast';
-import { set } from 'mongoose';
+
 import { LoaderIcon, Wand } from 'lucide-react';
 interface FormData {
     about: string,
@@ -19,7 +17,7 @@ interface FormData {
 const Create = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [aiData, setAiData] = useState<string | null>(null);
-    const { isLoaded, userId, sessionId, getToken } = useAuth();
+    const { userId, } = useAuth();
     const { register, handleSubmit, watch } = useForm<FormData>(
         {
             defaultValues: {

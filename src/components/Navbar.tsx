@@ -11,12 +11,12 @@ const Navbar = () => {
                     <h1 className='font-semibold text-secondary'>NYN</h1>
                 </Link>
             </div>
-            <nav className='flex gap-2'>
+            <nav className='flex gap-2 items-center'>
                 {
                     userId ? (
                         <>
                             <Link className='bg-white w-[185] h-[60] rounded-lg px-2 py-1' href="/create">Create</Link>
-                            <Link className='bg-white w-[185] h-[60] rounded-lg px-2 py-1' href="/resolutions">Resolutions</Link>
+                            <Link className='hover:text-secondary' href="/resolutions">Resolutions</Link>
                             <UserButton afterSignOutUrl="/" />
                         </>
                     ) : (

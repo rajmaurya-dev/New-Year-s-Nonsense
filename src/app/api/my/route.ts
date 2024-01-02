@@ -4,15 +4,12 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   try {
-    console.log("first");
     const { userId } = auth();
-    console.log(userId);
     const resolutions = await db.resolution.findMany({
       where: {
         userId: userId!,
       },
     });
-    console.log(resolutions);
     return NextResponse.json(resolutions, { status: 200 });
   } catch (error) {
     console.log(error);

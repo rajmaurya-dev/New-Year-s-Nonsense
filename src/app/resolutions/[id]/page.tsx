@@ -2,6 +2,7 @@
 import { db } from '@/lib/db';
 import { useAuth } from '@clerk/nextjs';
 import axios from 'axios';
+import { Share } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast';
@@ -9,9 +10,9 @@ import Markdown from 'react-markdown';
 
 const Resolution = ({ params }: any) => {
     console.log(params)
-    const { isLoaded, userId, sessionId, getToken } = useAuth();
-    const router = useRouter();
-    // Extract the ID from the URL
+    const { userId, } = useAuth();
+
+
 
     const [resolution, setResolution] = useState<{ id: string; content: string; userId: string; createdAt: Date; updatedAt: Date; } | null>(null);
 
@@ -44,12 +45,12 @@ const Resolution = ({ params }: any) => {
     };
 
     return (
-        <div className='custom-h grid place-content-center text-center'>
-            <div className='bg-primary shadow-md rounded-lg p-4 text-white'>
+        <div className='custom-h grid place-content-center text-start'>
+            <div className='bg-white shadow-md rounded-lg p-4 text-primary'>
                 <Markdown>{resolution.content}</Markdown>
             </div>
-            <button className='mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded' onClick={copyToClipboard}>
-                Copy to Clipboard
+            <button className='mt-4 bg-white text-primary font-bold py-2 px-4 rounded flex gap-5 justify-center hover:bg-green-600' onClick={copyToClipboard}>
+                <Share /> <span className='font-thin'>Share with friends and family</span>
             </button>
         </div>
 

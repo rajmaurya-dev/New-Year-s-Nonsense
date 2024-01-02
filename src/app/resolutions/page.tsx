@@ -3,8 +3,10 @@ import Card from '@/components/Card'
 import { db } from '@/lib/db';
 import { useAuth } from '@clerk/nextjs';
 import axios from 'axios';
+import { ArrowBigRightDash, ArrowRightCircle, DoorOpen, Share } from 'lucide-react';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
+import toast from 'react-hot-toast';
 import Markdown from 'react-markdown';
 
 const MyResolutions = () => {
@@ -23,16 +25,39 @@ const MyResolutions = () => {
 
         fetchResolutions();
     }, [userId]);
-    return (
-        <div className='flex flex-col md:flex-row gap-2 py-2 px-2'>
-            {resolutions.map((resolution) => (
-                <Link href={`/resolutions/${resolution.id}`} key={resolution.id} className='bg-primary shadow-md rounded-lg p-4 md:w-1/2 lg:w-1/3 xl:w-1/4'>
+    const copyToClipboard = async (id: string) => {
 
-                    <div className='prose max-w-none'>
+        try {
+            await navigator.clipboard.writeText(`https://nyn.rajcrafts.tech/resolutions/${id}`);
+            toast.success('Copied to clipboard!');
+        } catch (err: any) {
+            toast.error('Failed to copy text: ', err);
+            console.error('Failed to copy text: ', err);
+        }
+    };
+
+
+    return (
+        <div className={`gap-5 py-2 px-2  masonry`} >
+            {resolutions.map((resolution) => (
+                <div key={resolution.id} className=' item bg-white rounded-md  backdrop-filter backdrop-blur-sm h-fit border border-gray-100 p-4'>
+                    <div className=''>
                         <Markdown>{resolution.content}</Markdown>
                     </div>
+                    <div className='flex justify-end'>
 
-                </Link>
+                        <Link href={`/resolutions/${resolution.id}`}>
+                            <DoorOpen className='text-primary' />
+                        </Link>
+
+
+                        <button className='' onClick={() => copyToClipboard(resolution.id)}>
+                            <Share className='text-primary' />
+                        </button>
+
+                    </div>
+
+                </div>
             ))}
         </div>
     )

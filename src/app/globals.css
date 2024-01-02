@@ -10,3 +10,20 @@ body {
 .custom-h {
   min-height: calc(100vh - 100px);
 }
+
+.masonry {
+  column-count: 3;
+  column-gap: 1em;
+}
+@media (max-width: 768px) {
+  .masonry {
+    column-count: 1;
+  }
+}
+
+.item {
+  break-inside: avoid;
+  padding: 1em;
+  margin-bottom: 1em;
+  background-color: white;
+}
