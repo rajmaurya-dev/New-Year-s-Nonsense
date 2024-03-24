@@ -63,9 +63,9 @@ const Create = () => {
     };
 
     return (
-        <div className='bg-secondary flex flex-col custom-h items-center justify-center'>
-            <form onSubmit={handleSubmit(onSubmit)} className='bg-secondary rounded-lg flex flex-col items-center p-4 md:p-8'>
-                <div className='bg-secondary-light py-5 px-4 md:px-8 rounded-lg'>
+        <div className='bg-white flex flex-col custom-h items-center justify-center'>
+            <form onSubmit={handleSubmit(onSubmit)} className='bg-gradient-to-r from-red-500 to-orange-500 rounded-lg flex flex-col items-center p-4 md:p-8'>
+                <div className=' py-5 px-4 md:px-8 rounded-lg'>
                     <textarea
                         {...register("about")}
                         className='w-full md:w-[590px] h-24 md:h-[171px] rounded-lg text-center'
@@ -105,7 +105,7 @@ const Create = () => {
                     </div>
                 </div>
 
-                <button type="submit" disabled={loading} className='w-full md:w-[465px] mt-5 py-2 bg-white text-center text-black rounded-2xl flex justify-center'>
+                <button type="submit" disabled={loading} className='w-full md:w-[465px] mt-5 py-2 bg-gradient-to-r from-rose-400 to-orange-300 text-center text-black rounded-2xl flex justify-center'>
                     {loading ? <LoaderIcon className='animate-spin' /> : <Wand className='text-primary' />}
                 </button>
 
@@ -113,7 +113,7 @@ const Create = () => {
 
             {aiData && (
                 <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 z-50 ">
-                    <div className="bg-primary p-4 sm:p-8 rounded-10 w-full sm:w-[90vw] lg:w-[80vw] xl:w-[60vw] 2xl:w-[50vw] mx-2 md:mx-0 rounded-md text-white">
+                    <div className="bg-gradient-to-r from-rose-400 to-orange-300 p-4 sm:p-8 rounded-10 w-full sm:w-[90vw] lg:w-[80vw] xl:w-[60vw] 2xl:w-[50vw] mx-2 md:mx-0 rounded-md text-white">
                         <Markdown>{aiData}</Markdown>
                         <div className="flex mt-4 gap-4">
                             <button onClick={handleCreate} disabled={loading} className=" bg-blue-500 text-white px-4 py-2 rounded">Create</button>

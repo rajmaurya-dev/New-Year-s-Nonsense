@@ -32,10 +32,10 @@ const MyResolutions = () => {
         try {
             await navigator.clipboard.writeText(`https://nyn.rajcrafts.tech/resolutions/${id}`);
 
-            toast.success('Copied to clipboard!');
+            toast.success('Link Copied to clipboard!');
         } catch (err: any) {
-            toast.error('Failed to copy text: ', err);
-            console.error('Failed to copy text: ', err);
+            toast.error('Failed to copy Link: ', err);
+            console.error('Failed to copy Link: ', err);
         }
     };
 
@@ -63,7 +63,7 @@ const MyResolutions = () => {
     return (
         <div className={`gap-5 py-2 px-2  masonry`} >
             {resolutions.map((resolution) => (
-                <div key={resolution.id} className=' item bg-gray-400  shadow-md shadow-gray-900 rounded-lg p-4 text-white backdrop-filter backdrop-blur-sm bg-opacity-10  h-fit '>
+                <div key={resolution.id} className=' item bg-gradient-to-r from-red-500 to-orange-500  shadow-md shadow-gray-900 rounded-lg p-4 text-white backdrop-filter backdrop-blur-sm bg-opacity-10  h-fit '>
                     <div className=''>
                         <Markdown>{resolution.content}</Markdown>
                     </div>

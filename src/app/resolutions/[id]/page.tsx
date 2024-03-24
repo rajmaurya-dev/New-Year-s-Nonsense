@@ -62,7 +62,7 @@ const Resolution = ({ params }: any) => {
 
     return (
         <div className='custom-h grid place-content-center text-start'>
-            <div className="md:w-[60vw] bg-gray-400 shadow-md rounded-lg p-4 text-white backdrop-filter backdrop-blur-sm bg-opacity-10  ">
+            <div className="md:w-[60vw] bg-gradient-to-r from-red-500 to-orange-500 shadow-md rounded-lg p-4 text-white backdrop-filter backdrop-blur-sm bg-opacity-10  ">
                 <Markdown>{resolution.content}</Markdown>
                 <div>
                     <span className='font-bold'>Created by:{resolution?.creatorName} </span>

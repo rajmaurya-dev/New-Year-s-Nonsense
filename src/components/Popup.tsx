@@ -21,7 +21,7 @@ const Popup: React.FC<PopupProps> = ({ message }) => {
             <div className="bg-white rounded-lg max-w-xl mx-auto p-4 space-y-2 text-center">
                 <h2 className="text-2xl font-semibold">Welcome to Resolution App!</h2>
                 <div className='flex flex-col'>
-                    <span>
+                    <span className='bg-gradient-to-r from-red-500 to-orange-500 py-2 px-4  text-white rounded-md'>
 
                         {message}
                     </span>
