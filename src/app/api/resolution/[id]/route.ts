@@ -14,6 +14,9 @@ export async function GET(
       where: {
         id: id as string,
       },
+      include: {
+        points: true,
+      },
     });
 
     if (!resolution) {

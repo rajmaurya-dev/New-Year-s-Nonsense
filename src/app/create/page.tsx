@@ -7,128 +7,285 @@ import { set, useForm } from 'react-hook-form';
 import { useAuth, useUser } from '@clerk/nextjs';
 import toast from 'react-hot-toast';
 
-import { LoaderIcon, RefreshCcw, Wand } from 'lucide-react';
+import { LoaderIcon, Pencil, RefreshCcw, Wand } from "lucide-react";
 interface FormData {
-    about: string,
-    goal: string
-
+  about: string;
+  goal: string;
 }
-
+interface AiResponse {
+  resolutionName: string;
+  isEditing?: boolean;
+}
 const Create = () => {
-    const [loading, setLoading] = useState<boolean>(false);
-    const [aiData, setAiData] = useState<string | null>(null);
-    const { userId, } = useAuth();
-    const { user } = useUser()
-    const { register, handleSubmit, watch } = useForm<FormData>(
-        {
-            defaultValues: {
-                goal: 'realistic'
-            }
-        }
-    );
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [aiData, setAiData] = useState<AiResponse[]>([]);
+  const { userId } = useAuth();
+  const { user } = useUser();
+  const { register, handleSubmit, watch } = useForm<FormData>({
+    defaultValues: {
+      goal: "realistic",
+    },
+  });
 
+  const onSubmit = async (data: FormData) => {
+    try {
+      setLoading(true);
+      setIsGenerating(true);
+      const response = await axios.post("/api/ai/realistic", {
+        prompt: data.about,
+        goal: data.goal,
+      });
+      toast.success("Resolution generated successfully");
+      const cleanJsonString = response.data
+        .replace(/```json\n/, "")
+        .replace(/\n```$/, "");
 
-    const onSubmit = async (data: FormData) => {
-        try {
-            setLoading(true);
-            const response = await axios.post('/api/ai/realistic', { prompt: data.about, goal: data.goal });
-            toast.success('Resolution generated successfully');
-            setAiData(response.data);
-            setLoading(false);
-        } catch (error) {
-            setLoading(false);
-            toast.error('Error generating resolution');
-            console.error(error);
-        }
-    };
+      const parsedData = JSON.parse(cleanJsonString);
+      setAiData(parsedData);
+      console.log(aiData, "aiData");
+      console.log(response.data, "res");
+      setLoading(false);
+      setIsGenerating(false);
+    } catch (error) {
+      setLoading(false);
+      toast.error("Error generating resolution");
+      console.error(error);
+      setIsGenerating(false);
+    }
+  };
 
-    const handleCreate = async () => {
-        setLoading(true);
-        try {
+  const handleCreate = async () => {
+    setLoading(true);
+    try {
+      const resolution = await axios.post("/api/create", {
+        title: "My Resolutions for 2024", // Or get from form
+        userId: userId,
+        creatorName: user?.firstName,
+        points: aiData?.map((item: AiResponse) => ({
+          content: item.resolutionName,
+          isCompleted: false,
+        })),
+        category: "personal", // Or get from form
+        isCompleted: false,
+      });
+      setLoading(false);
+      toast.success("Resolution created successfully");
+      setAiData([]);
+    } catch (error: any) {
+      setLoading(false);
+      setAiData([]);
+      console.error("Error creating resolution:", error);
+      toast.error("Error creating resolution", error);
+    }
+  };
+  const handleEdit = (index: number) => {
+    const newData = [...aiData];
+    newData[index].isEditing = true;
+    setAiData(newData);
+  };
 
-            const resolution = await axios.post('/api/create', {
-                content: aiData,
-                userId: userId,
-                creatorName: user?.firstName
-            });
-            setLoading(false);
-            toast.success('Resolution created successfully');
-            setAiData(null);
-        } catch (error: any) {
-            setLoading(false);
-            setAiData(null);
-            console.error('Error creating resolution:', error);
-            toast.error('Error creating resolution', error);
-        }
-    };
-
-    return (
-        <div className='bg-white flex flex-col custom-h items-center justify-center'>
-            <form onSubmit={handleSubmit(onSubmit)} className='bg-gradient-to-r from-red-500 to-orange-500 rounded-lg flex flex-col items-center p-4 md:p-8'>
-                <div className=' py-5 px-4 md:px-8 rounded-lg'>
-                    <textarea
-                        {...register("about")}
-                        className='w-full md:w-[590px] h-24 md:h-[171px] rounded-lg text-center'
-                        placeholder="Tell us about yourself or what you want to improve in this year?"
-                    />
-                    <p className='text-center text-white font-normal py-2'>Set Your Goal:</p>
-                    <div className="flex flex-col md:flex-row justify-center md:space-x-4">
-                        <input
-                            {...register("goal")}
-                            type="radio"
-                            id="realistic"
-                            name="goal"
-                            value="realistic"
-                            className="hidden"
-                        />
-                        <label
-                            htmlFor="realistic"
-                            className={`cursor-pointer px-4 py-2 mb-2 md:mb-0 rounded-md ${watch('goal') === 'realistic' ? 'bg-green-600 text-white' : 'bg-white text-black'}`}
-                        >
-                            Realistic
-                        </label>
-
-                        <input
-                            {...register("goal")}
-                            type="radio"
-                            id="unrealistic"
-                            name="goal"
-                            value="unrealistic"
-                            className="hidden"
-                        />
-                        <label
-                            htmlFor="unrealistic"
-                            className={`cursor-pointer px-4 py-2 rounded-md ${watch('goal') === 'unrealistic' ? 'bg-red-600 text-white' : 'bg-white text-black'}`}
-                        >
-                            Unrealistic
-                        </label>
-                    </div>
+  const handleSave = (index: number, newContent: string) => {
+    if (!newContent.trim()) return;
+    const newData = [...aiData];
+    newData[index].resolutionName = newContent;
+    newData[index].isEditing = false;
+    setAiData(newData);
+  };
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto p-6">
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* Left Column - Form */}
+          <div className="bg-white rounded-2xl shadow-sm p-6">
+            <h1 className="text-2xl font-bold mb-6">
+              Create Your 2024 Resolutions
+            </h1>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    What do you want to improve this year?
+                  </label>
+                  <textarea
+                    {...register("about")}
+                    className="w-full h-32 rounded-lg border border-gray-200 p-4 text-gray-700 focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all resize-none"
+                    placeholder="Tell us about your goals..."
+                  />
                 </div>
 
-                <button type="submit" disabled={loading} className='w-full md:w-[465px] mt-5 py-2 bg-gradient-to-r from-rose-400 to-orange-300 text-center text-black rounded-2xl flex justify-center'>
-                    {loading ? <LoaderIcon className='animate-spin' /> : <Wand className='text-primary' />}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Set Your Goal Type:
+                  </label>
+                  <div className="flex gap-4">
+                    <div className="flex-1">
+                      <input
+                        {...register("goal")}
+                        type="radio"
+                        id="realistic"
+                        value="realistic"
+                        className="peer hidden"
+                      />
+                      <label
+                        htmlFor="realistic"
+                        className="flex items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-all peer-checked:border-green-500 peer-checked:bg-green-50 hover:bg-gray-50"
+                      >
+                        Realistic
+                      </label>
+                    </div>
+                    <div className="flex-1">
+                      <input
+                        {...register("goal")}
+                        type="radio"
+                        id="unrealistic"
+                        value="unrealistic"
+                        className="peer hidden"
+                      />
+                      <label
+                        htmlFor="unrealistic"
+                        className="flex items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-all peer-checked:border-rose-500 peer-checked:bg-rose-50 hover:bg-gray-50"
+                      >
+                        Unrealistic
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3 bg-gradient-to-r from-rose-500 to-orange-500 text-white rounded-lg font-medium hover:from-rose-600 hover:to-orange-600 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <LoaderIcon className="animate-spin" />
+                  ) : (
+                    <>
+                      <Wand className="w-5 h-5" />
+                      <span>Generate Resolutions</span>
+                    </>
+                  )}
                 </button>
-
+              </div>
             </form>
-
-            {aiData && (
-                <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 z-50 ">
-                    <div className="bg-gradient-to-r from-rose-400 to-orange-300 p-4 sm:p-8 rounded-10 w-full sm:w-[90vw] lg:w-[80vw] xl:w-[60vw] 2xl:w-[50vw] mx-2 md:mx-0 rounded-md text-white">
-                        <Markdown>{aiData}</Markdown>
-                        <div className="flex mt-4 gap-4">
-                            <button onClick={handleCreate} disabled={loading} className=" bg-blue-500 text-white px-4 py-2 rounded">Create</button>
-                            <button onClick={() => setAiData(null)} className="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
-                            <button disabled={loading} onClick={handleSubmit(onSubmit)} className='mr-2 bg-blue-500 text-white px-4 py-2 rounded'>
-                                {loading ? <LoaderIcon className='animate-spin' /> : <RefreshCcw />}
-                            </button>
-                        </div>
-                    </div>
+          </div>
+          {/* Right Column - Results */}
+          <div className="">
+            {isGenerating ? (
+              <div className="animate-pulse">
+                <div className="flex justify-between items-center mb-6">
+                  <div className="h-8 w-48 bg-gray-200 rounded-lg" />
+                  <div className="h-8 w-8 bg-gray-200 rounded-lg" />
                 </div>
+
+                <div className="space-y-3 mb-6">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="flex items-center space-x-4">
+                      <div className="h-12 bg-gray-200 rounded-lg w-full" />
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex gap-3">
+                  <div className="h-12 bg-gray-200 rounded-lg flex-1" />
+                  <div className="h-12 w-24 bg-gray-200 rounded-lg" />
+                </div>
+              </div>
+            ) : (
+              <div
+                className={`bg-white rounded-2xl shadow-sm p-6 transition-all ${
+                  aiData.length > 0 ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                {aiData.length > 0 && (
+                  <>
+                    <div className="flex justify-between items-center mb-6">
+                      <h2 className="text-2xl font-bold">
+                        Your 2024 Resolutions
+                      </h2>
+                      <div className="flex gap-2">
+                        <button
+                          disabled={loading}
+                          onClick={handleSubmit(onSubmit)}
+                          className="p-2 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
+                        >
+                          {loading ? (
+                            <LoaderIcon className="w-5 h-5 animate-spin" />
+                          ) : (
+                            <RefreshCcw size={20} className="text-gray-600" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3 mb-6">
+                      {aiData.map((item, index) => (
+                        <div
+                          key={index}
+                          className="p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors group"
+                        >
+                          {item.isEditing ? (
+                            <div className="flex gap-2">
+                              <input
+                                type="text"
+                                defaultValue={item.resolutionName}
+                                className="flex-1 px-2 py-1 border rounded-md focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                                onBlur={(e) =>
+                                  handleSave(index, e.target.value)
+                                }
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    handleSave(index, e.currentTarget.value);
+                                  }
+                                }}
+                                autoFocus
+                              />
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-between">
+                              <p className="text-gray-700">
+                                {index + 1}. {item.resolutionName}
+                              </p>
+                              <button
+                                onClick={() => handleEdit(index)}
+                                className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 rounded transition-all"
+                              >
+                                <Pencil size={14} className="text-gray-500" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="flex gap-3">
+                      <button
+                        onClick={handleCreate}
+                        disabled={loading}
+                        className="flex-1 py-3 bg-rose-500 text-white rounded-lg font-medium hover:bg-rose-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                      >
+                        {loading ? (
+                          <LoaderIcon className="animate-spin" />
+                        ) : (
+                          "Create Resolutions"
+                        )}
+                      </button>
+                      <button
+                        onClick={() => setAiData([])}
+                        className="py-3 px-6 border border-gray-200 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             )}
-
-
+          </div>
         </div>
-    )
-}
+      </div>
+    </div>
+  );
+};
 
 export default Create

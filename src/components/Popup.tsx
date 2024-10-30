@@ -1,39 +1,57 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { LogIn } from "lucide-react";
+
 interface PopupProps {
-    message: string;
+  message: string;
 }
+
 const Popup: React.FC<PopupProps> = ({ message }) => {
-    return (
+  return (
+    <motion.div
+      className="fixed bottom-0 mb-8 inset-x-0 flex justify-center z-50 px-4"
+      initial={{ y: 100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      exit={{ y: 100, opacity: 0 }}
+      transition={{
+        type: "spring",
+        stiffness: 300,
+        damping: 25,
+      }}
+    >
+      <div className="bg-white rounded-2xl shadow-xl max-w-md w-full mx-auto p-6 space-y-4">
         <motion.div
-            className="fixed bottom-0 mb-4 inset-x-0 flex justify-center"
-            initial={{ scale: 0.95 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0.95 }}
-            transition={{
-                type: 'spring',
-                stiffness: 300,
-                damping: 20,
-                repeat: Infinity,
-                repeatType: 'reverse',
-            }}
+          initial={{ scale: 0.95 }}
+          animate={{ scale: 1 }}
+          transition={{
+            repeat: Infinity,
+            repeatType: "reverse",
+            duration: 2,
+          }}
         >
-            <div className="bg-white rounded-lg max-w-xl mx-auto p-4 space-y-2 text-center">
-                <h2 className="text-2xl font-semibold">Welcome to Resolution App!</h2>
-                <div className='flex flex-col'>
-                    <span className='bg-gradient-to-r from-red-500 to-orange-500 py-2 px-4  text-white rounded-md'>
-
-                        {message}
-                    </span>
-                    <Link href="/create" className="text-blue-500 underline">
-                        sign in with Google
-                    </Link>
-
-                </div>
-            </div>
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-rose-500 to-orange-500 bg-clip-text text-transparent">
+            Welcome to Resolution App!
+          </h2>
         </motion.div>
-    );
-}
 
+        <div className="space-y-4">
+          <div className="bg-gradient-to-r from-rose-500 to-orange-500 p-[2px] rounded-lg">
+            <div className="bg-white rounded-lg p-4">
+              <p className="text-gray-700">{message}</p>
+            </div>
+          </div>
 
-export default Popup
+          <Link
+            href="/create"
+            className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-rose-500 to-orange-500 text-white rounded-lg font-medium hover:from-rose-600 hover:to-orange-600 transition-colors"
+          >
+            <LogIn size={20} />
+            Sign in with Google
+          </Link>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+export default Popup;

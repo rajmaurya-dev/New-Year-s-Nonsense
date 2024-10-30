@@ -9,6 +9,9 @@ export async function GET(req: NextRequest) {
       where: {
         userId: userId!,
       },
+      include: {
+        points: true,
+      },
     });
     return NextResponse.json(resolutions, { status: 200 });
   } catch (error) {

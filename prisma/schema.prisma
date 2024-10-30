@@ -11,10 +11,24 @@ datasource db {
 }
 
 model Resolution {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  content     String
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
   userId      String
   creatorName String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  points      ResolutionPoint[]
+  category    String?
+  isCompleted Boolean          @default(false)
+  completedAt DateTime?
+}
+model ResolutionPoint {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  content      String
+  isCompleted  Boolean    @default(false)
+  completedAt  DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  resolution   Resolution @relation(fields: [resolutionId], references: [id], onDelete: Cascade)
+  resolutionId String     @db.ObjectId
 }

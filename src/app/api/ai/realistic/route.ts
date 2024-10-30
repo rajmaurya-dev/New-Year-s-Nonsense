@@ -23,7 +23,11 @@ export async function POST(request: NextRequest) {
   if (goal === "realistic") {
     const parts = [
       {
-        text: `Make resolutions that seem impossible for the New Year, but can actually happen in real life. Keep the goals short and easy to understand. give 10 points only in markdown format. no big sentences ${prompt}}}`,
+        text: `Make resolutions for the New Year. Keep the goals short and easy to understand. give 12 resolutions. no big sentences ${prompt}}}. using this json schema: 
+        
+Resolutions = {'resolutionName': string}
+Return: Array<Recipe>
+        `,
       },
     ];
     const result = await model.generateContent({
@@ -38,7 +42,10 @@ export async function POST(request: NextRequest) {
   if (goal === "unrealistic") {
     const parts = [
       {
-        text: `Make resolutions that seem impossible and funny for the New Year. Keep the goals short and easy to understand. give 10 points only in markdown format. no big sentences ${prompt}}}`,
+        text: `Make resolutions that seem impossible and funny for the New Year. Keep the goals short and easy to understand.  give 12 resolutions. no big sentences ${prompt}}}. using this json schema: 
+        
+Resolutions = {'resolutionName': string}
+Return: Array<Recipe> `,
       },
     ];
     const result = await model.generateContent({
@@ -48,6 +55,7 @@ export async function POST(request: NextRequest) {
     });
     const response = result.response;
     const aiResponse = response.text();
+    console.log(aiResponse);
     return NextResponse.json(aiResponse);
   }
 }
