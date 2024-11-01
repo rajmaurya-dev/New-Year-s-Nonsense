@@ -8,7 +8,7 @@ import { useAuth, useUser } from "@clerk/nextjs";
 import toast from "react-hot-toast";
 
 import { LoaderIcon, Pencil, RefreshCcw, Wand } from "lucide-react";
-import { Resolution } from "../../../types/resolution";
+import { Resolution } from "../../types/resolution";
 import Link from "next/link";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";

@@ -18,29 +18,26 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Markdown from "react-markdown";
-import { Resolution } from "../../../types/resolution";
+import { Resolution } from "../../types/resolution";
 import { useRouter } from "next/navigation";
+import {
+  useDeleteResolution,
+  useResolutions,
+  useUpdatePoint,
+} from "@/lib/queries";
 
 const MyResolutions = () => {
   const { userId } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const [resolutions, setResolutions] = useState<Resolution[]>([]);
+  const { data: resolutions, isLoading, error } = useResolutions(userId!);
+  const deleteResolution = useDeleteResolution();
+  const updatePoint = useUpdatePoint();
   const router = useRouter();
-  const fetchResolutions = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get("/api/my");
-      console.log(response.data);
-      setResolutions(response.data);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching resolutions:", error);
-    }
-    setLoading(false);
-  };
+
   useEffect(() => {
-    fetchResolutions();
-  }, [userId]);
+    if (error) {
+      toast.error("Failed to fetch resolutions");
+    }
+  }, [resolutions]);
   const copyToClipboard = async (id: string) => {
     try {
       await navigator.clipboard.writeText(
@@ -54,70 +51,26 @@ const MyResolutions = () => {
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="custom-h w-screen grid place-content-center">
         <LoaderIcon size={48} className=" text-blue-700 animate-spin" />
       </div>
     );
   }
-  const handleDelete = async (id: any) => {
+
+  const handleDelete = async (id: string) => {
     try {
-      const resolution = await axios.delete("/api/create", {
-        data: {
-          id: id,
-          userId: userId,
-        },
-      });
-      setResolutions((prevResolutions) =>
-        prevResolutions.filter((resolution) => resolution.id !== id)
-      );
+      await deleteResolution.mutateAsync({ id, userId: userId! });
       toast.success("Resolution deleted successfully");
-    } catch (error: any) {
-      console.error("Error deleting resolution:", error);
-      toast.error("Error deleting resolution", error);
-    }
-  };
-  const handleTogglePoint = async (resolutionId: string, pointId: string) => {
-    try {
-      const point = resolutions
-        .find((r) => r.id === resolutionId)
-        ?.points.find((p) => p.id === pointId);
-
-      if (!point) return;
-
-      const response = await axios.put("/api/create", {
-        id: resolutionId,
-        userId,
-        pointId,
-        isCompleted: !point.isCompleted,
-      });
-
-      // Update local state
-      setResolutions((prev) =>
-        prev.map((resolution) => {
-          if (resolution.id === resolutionId) {
-            return {
-              ...resolution,
-              points: resolution.points.map((p) =>
-                p.id === pointId ? { ...p, isCompleted: !p.isCompleted } : p
-              ),
-            };
-          }
-          return resolution;
-        })
-      );
-
-      toast.success("Progress updated!");
     } catch (error) {
-      toast.error("Failed to update progress");
-      console.error(error);
+      toast.error("Error deleting resolution");
     }
   };
 
   return (
     <div className="max-w-6xl mx-auto p-4 grid gap-6 md:grid-cols-2 lg:grid-cols-3 bg-gray-50">
-      {resolutions.map((resolution) => (
+      {resolutions?.map((resolution) => (
         <div
           key={resolution.id}
           className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow"

@@ -16,29 +16,32 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Markdown from "react-markdown";
-import { Resolution } from "../../../../types/resolution";
+import { Resolution } from "../../../types/resolution";
+import {
+  useDeleteResolution,
+  useResolution,
+  useResolutions,
+  useUpdatePoint,
+} from "@/lib/queries";
+import { useResolutionStore } from "@/store/resolution";
 
-const ResolutionDetail = ({ params }: any) => {
+const ResolutionDetail = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
   const { userId } = useAuth();
-  const [resolution, setResolution] = useState<Resolution | null>(null);
-
+  const { data: resolution, isLoading: resolutionLoading } = useResolution(
+    params.id
+  );
+  const { data: resolutions, isLoading: resolutionsLoading } = useResolutions(
+    userId!
+  );
+  const deleteResolution = useDeleteResolution();
+  const updatePoint = useUpdatePoint();
+  const { setCurrentResolution } = useResolutionStore();
   useEffect(() => {
-    const fetchResolution = async () => {
-      try {
-        const response = await axios.get(`/api/resolution/${params.id}  `);
-        setResolution(response.data);
-        console.log(response.data, "response.data");
-        console.log(resolution, "resolution");
-      } catch (error) {
-        console.error("Error fetching resolution:", error);
-      }
-    };
-
-    if (params.id) {
-      fetchResolution();
+    if (resolutions && resolution) {
+      setCurrentResolution(resolution);
     }
-  }, [params.id, userId]);
+  }, [resolution, setCurrentResolution]);
 
   if (!resolution) {
     return (
@@ -58,51 +61,29 @@ const ResolutionDetail = ({ params }: any) => {
       console.error("Failed to copy text: ", err);
     }
   };
-  const handleDelete = async (id: any) => {
+  const handleDelete = async (id: string) => {
     try {
-      const resolution = await axios.delete("/api/create", {
-        data: {
-          id: id,
-          userId: userId,
-        },
-      });
+      await deleteResolution.mutateAsync({ id, userId: userId! });
       router.push("/resolutions");
       toast.success("Resolution deleted successfully");
-    } catch (error: any) {
-      console.error("Error deleting resolution:", error);
-      toast.error("Error deleting resolution", error);
+    } catch (error) {
+      toast.error("Error deleting resolution");
     }
   };
 
   const handleTogglePoint = async (resolutionId: string, pointId: string) => {
+    const point = resolution.points.find((p) => p.id === pointId);
+    if (!point) return;
+
     try {
-      const point = resolution.points.find((p) => p.id === pointId);
-
-      if (!point) return;
-
-      const response = await axios.put("/api/create", {
-        id: resolutionId,
-        userId,
+      await updatePoint.mutateAsync({
+        resolutionId,
         pointId,
+        userId: userId!,
         isCompleted: !point.isCompleted,
       });
-
-      // Update local state
-      setResolution((prev) =>
-        prev
-          ? {
-              ...prev,
-              points: prev.points.map((p) =>
-                p.id === pointId ? { ...p, isCompleted: !p.isCompleted } : p
-              ),
-            }
-          : null
-      );
-
-      toast.success("Progress updated!");
     } catch (error) {
       toast.error("Failed to update progress");
-      console.error(error);
     }
   };
 

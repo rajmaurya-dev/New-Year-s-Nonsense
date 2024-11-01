@@ -7,25 +7,34 @@ import { ClerkProvider, auth } from '@clerk/nextjs'
 import { Toaster } from 'react-hot-toast'
 const inter = Inter({ subsets: ['latin'] })
 const poppins = Poppins({ weight: ["400", "500", "600", '700'], subsets: ["latin"] })
-
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
+import Providers from "@/components/Providers";
 
 export const metadata: Metadata = {
-  title: 'NYN: New Year\'s Nonsense',
-  description: ' Resolutions: Unboring them since 2023',
-}
+  title: "NYN: New Year's Nonsense",
+  description: " Resolutions: Unboring them since 2023",
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <ClerkProvider>
       <html lang="en">
         <body className={`${poppins.className} bg-gray-50 `}>
-          <Toaster />
-          <Navbar />
-          {children}
+          <Providers>
+            <Toaster />
+            <Navbar />
+            {children}
+          </Providers>
         </body>
       </html>
     </ClerkProvider>
