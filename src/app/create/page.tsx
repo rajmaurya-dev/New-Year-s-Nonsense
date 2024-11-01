@@ -10,10 +10,28 @@ import toast from "react-hot-toast";
 import { LoaderIcon, Pencil, RefreshCcw, Wand } from "lucide-react";
 import { Resolution } from "../../../types/resolution";
 import Link from "next/link";
-interface FormData {
-  about: string;
-  goal: string;
-}
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const formSchema = z.object({
+  title: z
+    .string()
+    .min(3, "Title must be at least 3 characters")
+    .max(50, "Title must be less than 50 characters"),
+  about: z
+    .string()
+    .min(10, "Please provide more details about your goals")
+    .max(500, "Please keep it under 500 characters"),
+  goal: z.enum(["realistic", "unrealistic"]),
+  category: z.enum([
+    "personal",
+    "health",
+    "career",
+    "financial",
+    "relationships",
+  ]),
+});
+interface FormData extends z.infer<typeof formSchema> {}
 interface AiResponse {
   resolutionName: string;
   isEditing?: boolean;
@@ -24,9 +42,16 @@ const Create = () => {
   const [aiData, setAiData] = useState<AiResponse[]>([]);
   const { userId } = useAuth();
   const { user } = useUser();
-  const { register, handleSubmit, watch } = useForm<FormData>({
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       goal: "realistic",
+      category: "personal",
     },
   });
 
@@ -59,16 +84,18 @@ const Create = () => {
 
   const handleCreate = async () => {
     setLoading(true);
+    const formData = watch();
+
     try {
       const resolution = await axios.post("/api/create", {
-        title: "My Resolutions for 2024",
+        title: formData.title,
         userId: userId,
         creatorName: user?.firstName,
         points: aiData?.map((item: AiResponse) => ({
           content: item.resolutionName,
           isCompleted: false,
         })),
-        category: "personal",
+        category: formData.category,
         isCompleted: false,
       });
       setLoading(false);
@@ -164,6 +191,46 @@ const Create = () => {
                 Create Your 2024 Resolutions
               </h1>
               <form onSubmit={handleSubmit(onSubmit)}>
+                <div className="space-y-6">
+                  {/* Title Field */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Resolution Title
+                    </label>
+                    <input
+                      {...register("title")}
+                      className="w-full rounded-lg border border-gray-200 p-3 text-gray-700 focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all"
+                      placeholder="My 2024 Goals"
+                    />
+                    {errors.title && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {errors.title.message}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Category Field */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Category
+                    </label>
+                    <select
+                      {...register("category")}
+                      className="w-full rounded-lg border border-gray-200 p-3 text-gray-700 focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all"
+                    >
+                      <option value="personal">Personal Growth</option>
+                      <option value="health">Health & Fitness</option>
+                      <option value="career">Career & Education</option>
+                      <option value="financial">Financial</option>
+                      <option value="relationships">Relationships</option>
+                    </select>
+                    {errors.category && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {errors.category.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
                 <div className="space-y-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
