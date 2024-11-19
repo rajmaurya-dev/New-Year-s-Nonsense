@@ -1,38 +1,34 @@
-import { UserButton, auth } from '@clerk/nextjs'
-import Link from 'next/link'
-import React from 'react'
+import Link from "next/link";
+import React from "react";
 
 const Navbar = () => {
-    const { userId } = auth()
-    return (
-      <div className="bg-gradient-to-r from-red-500 to-orange-500 flex items-center justify-between px-5 py-5 h-[5vh]">
-        <div>
-          <Link href="/">
-            <h1 className="font-semibold text-white">NYN</h1>
-          </Link>
-        </div>
-        <nav className="flex gap-5 items-center ">
-          {userId ? (
-            <>
-              <Link className="text-white" href="/create">
-                Create
-              </Link>
-              <Link className="text-white mr-10" href="/resolutions">
-                Resolutions
-              </Link>
-              <UserButton afterSignOutUrl="/" />
-            </>
-          ) : (
-            <Link
-              className="bg-white w-[185] h-[60] rounded-lg px-2 py-1"
-              href="/create"
-            >
-              Sign in
-            </Link>
-          )}
+  return (
+    <div className=" flex items-center justify-between px-5 bg-white w-full">
+      <div className="flex items-center gap-5">
+        <Link href="/">
+          <img
+            src="/logo.png"
+            alt="Resolution Hub Logo"
+            className="w-full h-32"
+          />
+        </Link>
+        <nav className="flex justify-between items-center gap-10">
+          <Link href={"#"}>Products</Link>
+          <Link href={"#features"}>Features</Link>
+          <Link href={"#"}>How it works</Link>
+          <Link href={"#faq"}>FAQ</Link>
         </nav>
       </div>
-    );
-}
+      <div>
+        <Link
+          className=" px-4 py-2 bg-orange-600 text-white font-medium rounded-2xl"
+          href="/dashboard"
+        >
+          Start Free{" "}
+        </Link>
+      </div>
+    </div>
+  );
+};
 
-export default Navbar
+export default Navbar;

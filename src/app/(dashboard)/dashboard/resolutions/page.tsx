@@ -1,6 +1,6 @@
-'use client'
-import { useAuth } from '@clerk/nextjs';
-import axios from 'axios';
+"use client";
+import { useAuth } from "@clerk/nextjs";
+import axios from "axios";
 import {
   ArrowBigRightDash,
   ArrowRightCircle,
@@ -18,7 +18,7 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Markdown from "react-markdown";
-import { Resolution } from "../../types/resolution";
+import { Resolution } from "../../../../types/resolution";
 import { useRouter } from "next/navigation";
 import {
   useDeleteResolution,
@@ -138,7 +138,9 @@ const MyResolutions = () => {
             {/* Footer */}
             <div className="flex items-center justify-between">
               <button
-                onClick={() => router.push(`/resolutions/${resolution.id}`)}
+                onClick={() =>
+                  router.push(`/dashboard/resolutions/${resolution.id}`)
+                }
                 className="text-rose-500 hover:text-rose-600 text-sm font-medium"
               >
                 View Details
@@ -154,4 +156,4 @@ const MyResolutions = () => {
   );
 };
 
-export default MyResolutions
+export default MyResolutions;

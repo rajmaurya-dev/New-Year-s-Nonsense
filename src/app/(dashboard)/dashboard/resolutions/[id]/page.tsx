@@ -1,8 +1,8 @@
-'use client'
-import Popup from '@/components/Popup';
-import { db } from '@/lib/db';
-import { useAuth } from '@clerk/nextjs';
-import axios from 'axios';
+"use client";
+import Popup from "@/components/Popup";
+import { db } from "@/lib/db";
+import { useAuth } from "@clerk/nextjs";
+import axios from "axios";
 import {
   CheckCircle2,
   Clock,
@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Markdown from "react-markdown";
-import { Resolution } from "../../../types/resolution";
+import { Resolution } from "../../../../../types/resolution";
 import {
   useDeleteResolution,
   useResolution,

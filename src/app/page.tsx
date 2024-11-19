@@ -1,8 +1,6 @@
 import FAQItem from "@/components/FaqItem";
-import { auth } from "@clerk/nextjs";
-import Image from "next/image";
+import Navbar from "@/components/Navbar";
 import Link from "next/link";
-// Replace your FAQ section with this:
 const faqData = [
   {
     question: "How does it work?",
@@ -28,10 +26,11 @@ const faqData = [
 export default function Home() {
   return (
     <main className="bg-white">
+      <Navbar />
       {/* Hero Section */}
-      <section className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-gray-50">
+      <section className="py-24 flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50">
         <div className="text-center max-w-4xl mx-auto px-4">
-          <p className="md:text-lg text-white w-fit mx-auto px-6 py-2 rounded-full mb-6 bg-gradient-to-r from-rose-400 to-orange-300 animate-pulse">
+          <p className="md:text-lg text-gray-800 w-fit mx-auto px-6 py-2 rounded-full mb-6 bg-white border border-gray-300">
             Making New Year's Resolutions Fun Again
           </p>
           <h1 className="text-3xl md:text-7xl font-bold text-secondary mb-8 leading-tight">
@@ -43,16 +42,19 @@ export default function Home() {
             memorable goals that you'll actually enjoy pursuing.
           </p>
           <Link
-            href="/create"
+            href="/dashbaord"
             className="bg-white text-white font-medium py-3 px-8 rounded-full bg-gradient-to-r from-red-500 to-orange-500 hover:scale-105 transition-transform"
           >
             Transform Your Goals
           </Link>
         </div>
+        <div>
+          <img src="/dashboard.png" alt="" className="w-full h-full" />
+        </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-gray-50">
+      <section id="features" className="py-20 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-4xl font-bold text-center mb-12 text-secondary">
             Why Choose Funny Resolutions?
@@ -96,7 +98,7 @@ export default function Home() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 bg-white">
+      <section id="faq" className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-4xl font-bold text-center mb-12 text-secondary">
             Frequently Asked Questions
@@ -124,7 +126,7 @@ export default function Home() {
             adventures
           </p>
           <Link
-            href="/create"
+            href="/dashboard"
             className="bg-white text-secondary font-medium py-3 px-8 rounded-full hover:bg-gray-100 transition-colors inline-block"
           >
             Start Creating Now

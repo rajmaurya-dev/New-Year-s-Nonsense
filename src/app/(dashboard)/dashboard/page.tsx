@@ -1,6 +1,6 @@
-'use client'
-import Markdown from 'react-markdown'
-import axios from 'axios';
+"use client";
+import Markdown from "react-markdown";
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { set, useForm } from "react-hook-form";
 
@@ -8,10 +8,10 @@ import { useAuth, useUser } from "@clerk/nextjs";
 import toast from "react-hot-toast";
 
 import { LoaderIcon, Pencil, RefreshCcw, Wand } from "lucide-react";
-import { Resolution } from "../../types/resolution";
 import Link from "next/link";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Resolution } from "@/types/resolution";
 
 const formSchema = z.object({
   title: z
@@ -37,6 +37,8 @@ interface AiResponse {
   isEditing?: boolean;
 }
 const Create = () => {
+  const [mounted, setMounted] = useState(false);
+
   const [isGenerating, setIsGenerating] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [aiData, setAiData] = useState<AiResponse[]>([]);
@@ -135,52 +137,16 @@ const Create = () => {
 
     fetchUserResolutions();
   }, [userId]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
   return (
-    <div className="h-[95vh] bg-gray-50 flex">
-      {/* Sidebar */}
-      <div className="w-64 bg-white border-r border-gray-200 h-full overflow-y-auto hidden md:block">
-        <div className="p-4 border-b">
-          <h2 className="font-semibold text-gray-800">Your Resolutions</h2>
-        </div>
-        <div className="p-3 space-y-2">
-          {userResolutions.map((resolution) => (
-            <Link
-              key={resolution.id}
-              href={`/resolutions/${resolution.id}`}
-              className="block p-3 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <div className="space-y-1">
-                <h3 className="font-medium text-gray-900 line-clamp-1">
-                  {resolution.title}
-                </h3>
-                <div className="flex items-center text-xs text-gray-500 space-x-2">
-                  <span>{resolution.points.length} points</span>
-                  <span>•</span>
-                  <span>{resolution.category}</span>
-                </div>
-                {/* Progress bar */}
-                <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-rose-400 to-orange-300"
-                    style={{
-                      width: `${
-                        (resolution.points.filter((p) => p.isCompleted).length /
-                          resolution.points.length) *
-                        100
-                      }%`,
-                    }}
-                  />
-                </div>
-              </div>
-            </Link>
-          ))}
-          {userResolutions.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
-              <p>No resolutions yet</p>
-            </div>
-          )}
-        </div>
-      </div>
+    <div className="h-screen bg-gray-50">
       {/* Main Content */}
       <div className="flex-1">
         <div className="max-w-7xl mx-auto p-6">
@@ -418,4 +384,4 @@ const Create = () => {
   );
 };
 
-export default Create
+export default Create;
