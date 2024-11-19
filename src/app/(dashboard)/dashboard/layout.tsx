@@ -15,7 +15,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${poppins.className}`}>
         <Sidebar />
-        <main className="min-h-screen ml-64">{children}</main>
+        <main className="min-h-screen md:ml-64">{children}</main>
       </body>
     </html>
   );
