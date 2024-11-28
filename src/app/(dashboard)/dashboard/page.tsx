@@ -1,5 +1,4 @@
 "use client";
-import Markdown from "react-markdown";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { set, useForm } from "react-hook-form";
@@ -8,10 +7,13 @@ import { useAuth, useUser } from "@clerk/nextjs";
 import toast from "react-hot-toast";
 
 import { LoaderIcon, Pencil, RefreshCcw, Wand } from "lucide-react";
-import Link from "next/link";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Resolution } from "@/types/resolution";
+import { queryClient } from "@/lib/queries";
+
+const queryKeys = {
+  resolutions: ["resolutions"] as const,
+};
 
 const formSchema = z.object({
   title: z
@@ -58,6 +60,8 @@ const Create = () => {
   });
 
   const onSubmit = async (data: FormData) => {
+    const MAX_RETRIES = 3;
+    let retryCount = 0;
     try {
       setLoading(true);
       setIsGenerating(true);
@@ -65,21 +69,29 @@ const Create = () => {
         prompt: data.about,
         goal: data.goal,
       });
-      toast.success("Resolution generated successfully");
-      const cleanJsonString = response.data
-        .replace(/```json\n/, "")
-        .replace(/\n```$/, "");
-
-      const parsedData = JSON.parse(cleanJsonString);
-      setAiData(parsedData);
-      console.log(aiData, "aiData");
-      console.log(response.data, "res");
-      setLoading(false);
-      setIsGenerating(false);
+      try {
+        const cleanJsonString = response.data
+          .replace(/```json\n/, "")
+          .replace(/\n```$/, "");
+        const parsedData = JSON.parse(cleanJsonString);
+        setAiData(parsedData);
+        toast.success("Resolution generated successfully");
+      } catch (parseError) {
+        if (retryCount < MAX_RETRIES) {
+          retryCount++;
+          return onSubmit(data);
+        } else {
+          toast.error("Try again");
+          throw new Error("Failed to parse response after multiple attempts");
+        }
+      }
     } catch (error) {
       setLoading(false);
       toast.error("Error generating resolution");
       console.error(error);
+      setIsGenerating(false);
+    } finally {
+      setLoading(false);
       setIsGenerating(false);
     }
   };
@@ -89,7 +101,7 @@ const Create = () => {
     const formData = watch();
 
     try {
-      const resolution = await axios.post("/api/create", {
+      await axios.post("/api/create", {
         title: formData.title,
         userId: userId,
         creatorName: user?.firstName,
@@ -101,6 +113,8 @@ const Create = () => {
         isCompleted: false,
       });
       setLoading(false);
+      await queryClient.invalidateQueries({ queryKey: queryKeys.resolutions });
+
       toast.success("Resolution created successfully");
       setAiData([]);
     } catch (error: any) {
@@ -123,28 +137,7 @@ const Create = () => {
     newData[index].isEditing = false;
     setAiData(newData);
   };
-  const [userResolutions, setUserResolutions] = useState<Resolution[]>([]);
 
-  useEffect(() => {
-    const fetchUserResolutions = async () => {
-      try {
-        const response = await axios.get("/api/my");
-        setUserResolutions(response.data);
-      } catch (error) {
-        console.error("Error fetching resolutions:", error);
-      }
-    };
-
-    fetchUserResolutions();
-  }, [userId]);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return null;
-  }
   return (
     <div className="h-screen bg-gray-50">
       {/* Main Content */}
@@ -295,9 +288,7 @@ const Create = () => {
                   {aiData.length > 0 && (
                     <>
                       <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-2xl font-bold">
-                          Your 2024 Resolutions
-                        </h2>
+                        <h2 className="text-2xl font-bold">{watch("title")}</h2>
                         <div className="flex gap-2">
                           <button
                             disabled={loading}

@@ -1,8 +1,6 @@
 "use client";
 import Popup from "@/components/Popup";
-import { db } from "@/lib/db";
 import { useAuth } from "@clerk/nextjs";
-import axios from "axios";
 import {
   CheckCircle2,
   Clock,
@@ -64,7 +62,7 @@ const ResolutionDetail = ({ params }: { params: { id: string } }) => {
   const handleDelete = async (id: string) => {
     try {
       await deleteResolution.mutateAsync({ id, userId: userId! });
-      router.push("/resolutions");
+      router.back();
       toast.success("Resolution deleted successfully");
     } catch (error) {
       toast.error("Error deleting resolution");

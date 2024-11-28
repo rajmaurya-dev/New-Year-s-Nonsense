@@ -27,7 +27,6 @@ if (goal === "realistic") {
   const parts = [
     {
       text: `i want ${prompt}. Make resolutions for the New Year. Keep the goals short and easy to understand. give 10 resolutions. no big sentences. . using this json schema: 
-        
 Resolutions = {'resolutionName': string}
 Return: Array<Recipe>
         `,

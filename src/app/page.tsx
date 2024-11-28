@@ -42,7 +42,7 @@ export default function Home() {
             memorable goals that you'll actually enjoy pursuing.
           </p>
           <Link
-            href="/dashbaord"
+            href="/dashboard"
             className="bg-white text-white font-medium py-3 px-8 rounded-full bg-gradient-to-r from-red-500 to-orange-500 hover:scale-105 transition-transform"
           >
             Transform Your Goals

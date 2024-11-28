@@ -1,40 +1,18 @@
 "use client";
 
-import { Resolution } from "@/types/resolution";
+import { useResolutions } from "@/lib/queries";
 import { useAuth, UserButton } from "@clerk/nextjs";
-import axios from "axios";
 import { Menu, Plus, X } from "lucide-react";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 type Props = {};
 
 const Sidebar = (props: Props) => {
-  const { userId } = useAuth();
-  const [userResolutions, setUserResolutions] = useState<Resolution[]>([]);
-  const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const { userId } = useAuth();
+  const { data: userResolutions } = useResolutions(userId!);
 
-  useEffect(() => {
-    const fetchUserResolutions = async () => {
-      try {
-        const response = await axios.get("/api/my");
-        setUserResolutions(response.data);
-      } catch (error) {
-        console.error("Error fetching resolutions:", error);
-      }
-    };
-
-    fetchUserResolutions();
-  }, [userId]);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return null;
-  }
   return (
     <>
       <button
@@ -67,7 +45,7 @@ const Sidebar = (props: Props) => {
           <h2 className="font-semibold text-gray-800">Resolution hub</h2>
         </div>
         <div className="flex-1 overflow-y-auto p-3 space-y-2">
-          {userResolutions.map((resolution) => (
+          {userResolutions?.map((resolution) => (
             <Link
               key={resolution.id}
               href={`/dashboard/resolutions/${resolution.id}`}
@@ -98,7 +76,7 @@ const Sidebar = (props: Props) => {
               </div>
             </Link>
           ))}
-          {userResolutions.length === 0 && (
+          {userResolutions?.length === 0 && (
             <div className="text-center py-8 text-gray-500">
               <p>No resolutions yet</p>
             </div>
