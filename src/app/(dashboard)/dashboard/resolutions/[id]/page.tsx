@@ -52,7 +52,7 @@ const ResolutionDetail = ({ params }: { params: { id: string } }) => {
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(
-        `https://nyn.rajcrafts.tech/resolutions/${params.id}`
+        `${window.location.origin}/share/${params.id}`
       );
       toast.success("Copied to clipboard!");
     } catch (err) {
@@ -183,9 +183,6 @@ const ResolutionDetail = ({ params }: { params: { id: string } }) => {
           </span>
         </div>
       </div>
-      {!userId && (
-        <Popup message="login now and start creating your Resolutions With help of AI" />
-      )}
     </div>
   );
 };
